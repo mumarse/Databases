@@ -1,0 +1,296 @@
+CREATE DATABASE BikeStores;
+
+CREATE SCHEMA Production;
+
+CREATE SCHEMA Territory;
+
+CREATE SCHEMA Sales;
+
+CREATE SCHEMA HR;
+
+
+-- Create a new table called '[Category]' in schema '[Production]'
+-- Drop the table if it already exists
+IF OBJECT_ID('[Production].[Category]', 'U') IS NOT NULL
+DROP TABLE [Production].[Category]
+
+-- Create the table in the specified schema
+CREATE TABLE Category
+(
+    Category_Id INT NOT NULL,
+    Category_Name VARCHAR(50) NOT NULL,
+
+    -- Table Level Constraint
+    CONSTRAINT PK_Category_Id PRIMARY KEY (Category_Id)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE Product
+(
+    Product_Id INT NOT NULL,
+    Product_Name VARCHAR(50) NOT NULL,
+    Category_Id INT NOT NULL,
+    Unit_Price FLOAT NOT NULL,
+    Is_Discontinued BIT NOT NULL,
+
+    -- Table Level Constraint
+    CONSTRAINT PK_Product_Id PRIMARY KEY (Product_Id),
+    CONSTRAINT FK_Category_Id FOREIGN KEY (Category_Id) REFERENCES Category(Category_Id)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE Country
+(
+    Country_Code VARCHAR(5) NOT NULL,
+    Country_Name VARCHAR(60) NOT NULL,
+
+    -- Table Level CONSTRAINT
+    CONSTRAINT PK_Country_Code PRIMARY KEY (Country_Code)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE City
+(
+    City_Id INT NOT NULL,
+    City_Name VARCHAR(60) NOT NULL,
+    Country_Code VARCHAR(5) NOT NULL,
+
+    -- Table Level CONSTRAINT
+    CONSTRAINT PK_City_Id PRIMARY KEY(City_Id),
+    CONSTRAINT FK_Country_Code FOREIGN KEY(Country_Code) REFERENCES Country(Country_Code)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE SalesTerritory
+(
+    Territory_Id INT NOT NULL,
+    Name VARCHAR(50) NOT NULL,
+    Country_Code VARCHAR(5) NOT NULL,
+
+    -- Table value CONSTRAINT
+    CONSTRAINT PK_Territory_Id PRIMARY KEY(Territory_Id),
+    CONSTRAINT FK_Country_Code FOREIGN KEY(Country_Code) REFERENCES Country(Country_Code)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE Employees
+(
+    Employee_Id INT NOT NULL,
+    First_Name VARCHAR(50) NOT NULL,
+    Last_Name VARCHAR(50) NOT NULL,
+    Birth_Date DATE NULL,
+    Hire_Date DATE NOT NULL,
+    City_Id INT NULL, 
+
+    -- Table Value Constrants
+    CONSTRAINT PK_Employee_Id PRIMARY KEY(Employee_Id),
+    CONSTRAINT FK_City_Id FOREIGN KEY(City_Id) REFERENCES City(City_Id)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE Customers
+(
+    Customer_Id INT NOT NULL,
+    First_Name VARCHAR(50) NOT NULL,
+    Last_Name VARCHAR(50) NOT NULL,
+    City_Id INT NULL,
+
+    -- Table VAlue CONSTRAINT
+    CONSTRAINT PK_Customer_Id PRIMARY KEY(Customer_Id),
+    CONSTRAINT FK_City_Id FOREIGN KEY (City_Id) REFERENCES City(City_Id)
+    -- Specify more columns here
+);
+
+-- Create the table in the specified schema
+CREATE TABLE Orders
+(
+    Orders_Id INT NOT NULL,
+    Employee_Id INT NOT NULL,
+    Customer_Id INT NOT NULL,
+    Order_Date DATE NOT NULL,
+    Required_Date DATE NOT NULL,
+    Shipped_Date DATE NULL,
+    Territory_Id INT NOT NULL,
+    
+    -- Table Value Constrants
+    CONSTRAINT PK_Orders_Id PRIMARY KEY(Orders_Id),
+    CONSTRAINT FK_Employee_Id FOREIGN KEY(Employee_Id) REFERENCES Employees(Employee_Id),
+    CONSTRAINT FK_Customer_Id FOREIGN KEY(Customer_Id) REFERENCES Customers(Customer_Id),
+    CONSTRAINT FK_Territory_Id FOREIGN KEY(Territory_Id) REFERENCES SalesTerritory(Territory_Id)
+    
+    -- Specify more columns here
+);
+
+
+-- Create the table in the specified schema
+CREATE TABLE OrderDetail
+(
+    Order_Id INT NOT NULL,
+    Product_Id INT NOT NULL,
+    Quantity INT NOT NULL,
+    Unit_Price MONEY NOT NULL,
+
+    -- TABLE VALUE CONSTRAINT
+
+    CONSTRAINT comp_PK_Order_Id_Product_Id PRIMARY KEY(Order_Id, Product_Id),
+    CONSTRAINT FK_Order_Id FOREIGN KEY(Order_Id) REFERENCES Orders (Orders_Id),
+    CONSTRAINT FK_Product_Id FOREIGN KEY(Product_Id) REFERENCES Product(Product_Id)
+    -- Specify more columns here
+);
+
+
+------------------ Insert data --------------------------
+
+-- Insert rows into table 'Category' in schema '[Production]'
+INSERT INTO Category
+( -- Columns to insert data into
+    Category_Id, Category_Name
+)
+VALUES
+( -- First row: values for the columns in the list above
+    101, 'Laptops'
+),
+( -- Second row: values for the columns in the list above
+    102, 'Mobile'
+),
+( -- Third row: values for the columns in the list above
+    103, 'PowerBank'
+);
+
+-- Insert rows into table 'Product' in schema '[Production]'
+INSERT INTO Product
+( -- Columns to insert data into
+    Product_Id, Product_Name, Category_Id, Unit_Price, Is_Discontinued
+)
+VALUES
+( 1, 'I-Phone 12', 102, 150000, b'1'),
+( 2, 'I-Phone 10', 102, 90000, b'0'),
+( 3, 'Dell I7', 101, 10000, b'1'),
+( 4, 'HP I6', 101, 60000, b'0'),
+( 5, 'Dell PowerBank', 103, 1000, b'1'),
+( 6, 'Sumsang PowerBank', 103, 2000, b'1');
+
+
+-- Insert rows into table 'Country' in schema '[Territory]'
+INSERT INTO Country
+( -- Columns to insert data into
+    Country_Code, Country_Name
+)
+VALUES
+('PAK', 'Pakistan'),
+('USA', 'United State of America'),
+('UK', 'United kingdom'),
+('INO', 'India'),
+('IR', 'Iran');
+
+
+-- Insert rows into table 'City' in schema '[Territory]'
+INSERT INTO City
+( -- Columns to insert data into
+    City_Id, City_Name, Country_Code
+)
+VALUES
+(1, 'Multan', 'PAK'),
+(2, 'Islamabad', 'PAK'),
+(3, 'New Delhi', 'INO'),
+(4, 'England', 'UK'),
+(5, 'New Gersey', 'USA'),
+(6, 'Lahore', 'PAK');
+
+
+-- Insert rows into table 'SalesTerritory' in schema '[Sales]'
+INSERT INTO SalesTerritory
+( -- Columns to insert data into
+    Territory_Id, Name, Country_Code
+)
+VALUES
+(1, 'East', 'PAK'),
+(2, 'Middle', 'PAK'),
+(3, 'North', 'PAK'),
+(4, 'North', 'UK'),
+(5, 'Center', 'UK'),
+(6, 'East', 'USA');
+
+-- Insert rows into table 'Employees' in schema '[HR]'
+INSERT INTO Employees
+( -- Columns to insert data into
+    Employee_Id, First_Name, Last_Name, Birth_Date, Hire_Date, City_Id
+)
+VALUES
+(5001, 'Hamid', 'Shakeel', '1999-02-21', '2019-01-20', 1 ),
+(5002, 'Ali', 'Raza', '1996-04-19', '2018-03-01', Null ),
+(5003, 'Umer', 'Shayzad', '1991-06-01', '2015-06-26', 2 ),
+(5004, 'Ali', 'Haider', '2000-05-15', '2021-07-27', Null ),
+(5005, 'Rizwan', 'Ali', '1999-04-19', '2019-03-06', 4 ),
+(5006, 'Ahamd', 'Shayzad', '1993-06-01', '2017-06-06', 3 );
+
+-- Insert rows into table 'Customers' in schema '[Sales]'
+INSERT INTO Customers
+( -- Columns to insert data into
+ Customer_Id, First_Name, Last_Name, City_Id
+)
+VALUES
+(3001, 'Muhammad', 'Anas', 1 ),
+(3002, 'Hadir', 'Raza', Null ),
+(3003, 'Umer', 'Shakeel', 2 ),
+(3004, 'Ramzan', 'Ahamd', Null ),
+(3005, 'Ali', 'Raza', 4 );
+
+-- Insert rows into table 'Order' in schema '[Sales]'
+INSERT INTO Orders
+( -- Columns to insert data into
+    Orders_Id, Employee_Id, Customer_Id, Order_Date, Required_Date, Shipped_Date, Territory_Id
+)
+VALUES
+(1, 5001, 3001,'2022-02-21', '2022-03-21', '2022-02-28', 1 ),
+(2, 5002, 3002,'2022-02-21', '2022-03-21', '2022-02-28', 2 ),
+(3, 5003, 3003,'2022-02-21', '2022-03-21', '2022-02-28', 3 ),
+(4, 5004, 3004,'2022-02-21', '2022-03-21', '2022-02-28', 4 ),
+(5, 5005, 3005,'2022-02-21', '2022-03-21', '2022-02-28', 5 );
+
+-- Insert rows into table 'OrderDetail' in schema '[Sales]'
+INSERT INTO OrderDetail
+( -- Columns to insert data into
+    Order_Id, Product_Id, Quantity, Unit_Price
+)
+VALUES
+(1, 1, 50, 3000),
+(4, 3, 20, 35000),
+(3, 4, 10, 4500),
+(2, 5, 60, 5000),
+(1, 3, 30, 35000),
+(5, 6, 40, 2000);
+
+-- Sellect The Table
+SELECT * FROM Category
+GO
+
+SELECT * FROM Product
+GO
+
+SELECT * FROM Country
+GO
+
+SELECT * FROM City
+GO
+
+SELECT * FROM SalesTerritory
+GO
+
+SELECT * FROM Employees
+GO
+
+SELECT * FROM Customers
+GO
+
+SELECT * FROM [Order]
+GO
+
+SELECT * FROM OrderDetail
+GO
